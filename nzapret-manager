@@ -1,27 +1,27 @@
 #!/usr/bin/env bash
-# zapretozz — Ubuntu DPI bypass manager (zapret wrapper)
+# nzapret-manager — Ubuntu DPI bypass manager (zapret wrapper)
 #
 # Usage:
-#   zapretozz                    open the TUI
-#   zapretozz install            install bol-van/zapret + systemd unit
-#   zapretozz update             update zapret to latest origin/HEAD
-#   zapretozz uninstall          remove zapret entirely
-#   zapretozz apply <id>         apply strategy by id (v1..v9, Yv01.., Dv1..Dv17)
-#   zapretozz list [scope]       list strategies (builtin|youtube|discord|all)
-#   zapretozz preview <id>       print the body of a strategy
-#   zapretozz current            show currently applied strategy
-#   zapretozz test [scope]       parallel-curl auto-test (general|youtube|discord|all)
-#   zapretozz fetch-youtube      (re)fetch the YouTube strategy catalog
-#   zapretozz hosts <enable|disable|list> [name]
-#   zapretozz service <start|stop|restart|enable|disable|status>
-#   zapretozz backup <create|list|restore <file>|prune [N]>
-#   zapretozz version
+#   nzapret-manager                    open the TUI
+#   nzapret-manager install            install bol-van/zapret + systemd unit
+#   nzapret-manager update             update zapret to latest origin/HEAD
+#   nzapret-manager uninstall          remove zapret entirely
+#   nzapret-manager apply <id>         apply strategy by id (v1..v9, Yv01.., Dv1..Dv17)
+#   nzapret-manager list [scope]       list strategies (builtin|youtube|discord|all)
+#   nzapret-manager preview <id>       print the body of a strategy
+#   nzapret-manager current            show currently applied strategy
+#   nzapret-manager test [scope]       parallel-curl auto-test (general|youtube|discord|all)
+#   nzapret-manager fetch-youtube      (re)fetch the YouTube strategy catalog
+#   nzapret-manager hosts <enable|disable|list> [name]
+#   nzapret-manager service <start|stop|restart|enable|disable|status>
+#   nzapret-manager backup <create|list|restore <file>|prune [N]>
+#   nzapret-manager version
 
 set -uo pipefail
 
-ZAPRETOZZ_HOME=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
-LIB="${ZAPRETOZZ_HOME}/lib"
-ZAPRETOZZ_DIR="$ZAPRETOZZ_HOME"
+NZAPRET_MANAGER_HOME=$(cd -- "$(dirname -- "$(readlink -f "${BASH_SOURCE[0]}")")" && pwd)
+LIB="${NZAPRET_MANAGER_HOME}/lib"
+NZAPRET_MANAGER_DIR="$NZAPRET_MANAGER_HOME"
 
 # shellcheck source=/dev/null
 . "${LIB}/common.sh"
@@ -53,7 +53,7 @@ case "$cmd" in
     update)          require_root; zapret_update ;;
     uninstall|remove) require_root; zapret_remove ;;
     apply)
-        [[ -n ${1:-} ]] || die "Usage: zapretozz apply <id>"
+        [[ -n ${1:-} ]] || die "Usage: nzapret-manager apply <id>"
         strategies_apply "$1"
         ;;
     list)
@@ -66,7 +66,7 @@ case "$cmd" in
         esac
         ;;
     preview)
-        [[ -n ${1:-} ]] || die "Usage: zapretozz preview <id>"
+        [[ -n ${1:-} ]] || die "Usage: nzapret-manager preview <id>"
         strategies_preview "$1"
         ;;
     current)         strategies_show_current ;;
@@ -81,8 +81,8 @@ case "$cmd" in
                     printf '%s %-18s %s\n' "$local_mark" "$b" "$(hosts_label_for "$b" || true)"
                 done
                 ;;
-            enable)  [[ -n ${1:-} ]] || die "Usage: zapretozz hosts enable <name>";  hosts_enable "$1" ;;
-            disable) [[ -n ${1:-} ]] || die "Usage: zapretozz hosts disable <name>"; hosts_disable "$1" ;;
+            enable)  [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts enable <name>";  hosts_enable "$1" ;;
+            disable) [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts disable <name>"; hosts_disable "$1" ;;
             disable-all) hosts_disable_all ;;
             *) die "Unknown hosts subcommand: $sub" ;;
         esac
@@ -105,17 +105,17 @@ case "$cmd" in
         case "$sub" in
             create)  backup_create ;;
             list)    backup_list ;;
-            restore) [[ -n ${1:-} ]] || die "Usage: zapretozz backup restore <file>"; backup_restore "$1" ;;
+            restore) [[ -n ${1:-} ]] || die "Usage: nzapret-manager backup restore <file>"; backup_restore "$1" ;;
             prune)   backup_prune "${1:-5}" ;;
             *) die "Unknown backup subcommand: $sub" ;;
         esac
         ;;
     version|-v|--version)
-        printf 'zapretozz %s\n' "$(git -C "$ZAPRETOZZ_HOME" rev-parse --short HEAD 2>/dev/null || echo unknown)"
+        printf 'nzapret-manager %s\n' "$(git -C "$NZAPRET_MANAGER_HOME" rev-parse --short HEAD 2>/dev/null || echo unknown)"
         zapret_print_versions
         ;;
     help|-h|--help)
         sed -n '2,20p' "$0" | sed 's/^# \{0,1\}//'
         ;;
-    *) die "Unknown command: $cmd. Try: zapretozz help" ;;
+    *) die "Unknown command: $cmd. Try: nzapret-manager help" ;;
 esac

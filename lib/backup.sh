@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tar.gz snapshots of zapret config + state + zapretozz hosts blocks.
+# tar.gz snapshots of zapret config + state + nzapret-manager hosts blocks.
 
 backup_create() {
     require_root
@@ -20,8 +20,8 @@ backup_create() {
         "${ZAPRET_CONFIG#/}" \
         "${STATE_DIR#/}" \
         "${ZAPRET_UNIT#/}" 2>/dev/null
-    tar -rzf "$archive" --transform "s,.*,zapretozz-hosts.snippet," "$hosts_snip" 2>/dev/null || \
-        tar -czf "$archive" --transform "s,.*,zapretozz-hosts.snippet," "$hosts_snip" 2>/dev/null
+    tar -rzf "$archive" --transform "s,.*,nzapret-manager-hosts.snippet," "$hosts_snip" 2>/dev/null || \
+        tar -czf "$archive" --transform "s,.*,nzapret-manager-hosts.snippet," "$hosts_snip" 2>/dev/null
     rm -f "$hosts_snip"
     ok "Backup: $archive"
 }
@@ -44,8 +44,8 @@ backup_restore() {
     systemctl stop "$SERVICE_NAME" 2>/dev/null || true
     info "Restoring $archive"
     tar -xzf "$archive" -C / 2>/dev/null
-    # Restore hosts snippet (drop any existing zapretozz markers first)
-    local snip; snip=$(tar -xzf "$archive" -O zapretozz-hosts.snippet 2>/dev/null || true)
+    # Restore hosts snippet (drop any existing nzapret-manager markers first)
+    local snip; snip=$(tar -xzf "$archive" -O nzapret-manager-hosts.snippet 2>/dev/null || true)
     if [[ -n $snip ]]; then
         local tmp; tmp=$(mktemp)
         awk -v p="$HOSTS_MARKER_PREFIX" '

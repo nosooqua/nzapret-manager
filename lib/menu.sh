@@ -3,7 +3,7 @@
 
 menu_header() {
     clear
-    header "zapretozz — DPI bypass manager"
+    header "nzapret-manager — DPI bypass manager"
     printf '  Service: %s\n' "$(service_status_line)"
     if zapret_is_installed; then
         local commit; commit=$(state_get ZAPRET_COMMIT 2>/dev/null || echo "?")

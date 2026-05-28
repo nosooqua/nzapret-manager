@@ -4,9 +4,9 @@
 # A "block" is a named fragment in data/hosts/<name>.hosts. Enabling a block
 # appends its content to /etc/hosts wrapped between markers:
 #
-#   # === zapretozz:<name> begin ===
+#   # === nzapret-manager:<name> begin ===
 #   <fragment>
-#   # === zapretozz:<name> end ===
+#   # === nzapret-manager:<name> end ===
 #
 # Disabling removes the lines between (and including) the markers. The marker
 # scheme guarantees idempotent enable/disable with no leftover state.

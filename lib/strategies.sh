@@ -90,7 +90,7 @@ strategies_apply() {
     local id="$1"
     local path
     path=$(strategies_path_for_id "$id") || die "Unknown strategy id: $id"
-    [[ -f $ZAPRET_CONFIG ]] || die "$ZAPRET_CONFIG not found; run: zapretozz install"
+    [[ -f $ZAPRET_CONFIG ]] || die "$ZAPRET_CONFIG not found; run: nzapret-manager install"
 
     local body; body=$(_strategy_body_oneline "$path")
     local ports; ports=$(_strategy_required_ports "$path")

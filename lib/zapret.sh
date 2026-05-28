@@ -23,8 +23,8 @@ zapret_clone() {
 zapret_build() {
     require_root
     info "Building zapret (make -C ${ZAPRET_DIR})"
-    if ! make -C "$ZAPRET_DIR" >/var/log/zapretozz/build.log 2>&1; then
-        err "Build failed. See /var/log/zapretozz/build.log"
+    if ! make -C "$ZAPRET_DIR" >/var/log/nzapret-manager/build.log 2>&1; then
+        err "Build failed. See /var/log/nzapret-manager/build.log"
         return 1
     fi
     ok "Build complete"
@@ -36,8 +36,8 @@ zapret_write_default_config() {
     [[ -f $ZAPRET_CONFIG ]] && return 0
     info "Writing default ${ZAPRET_CONFIG}"
     cat >"$ZAPRET_CONFIG" <<'CFG'
-# Minimal zapret config managed by zapretozz.
-# The block between the markers below is rewritten by `zapretozz apply <id>`.
+# Minimal zapret config managed by nzapret-manager.
+# The block between the markers below is rewritten by `nzapret-manager apply <id>`.
 
 FWTYPE=iptables
 MODE=nfqws
@@ -52,9 +52,9 @@ NFQWS_TCP_PKT_OUT=9
 NFQWS_TCP_PKT_IN=3
 NFQWS_UDP_PKT_OUT=9
 
-# === zapretozz strategy begin ===
+# === nzapret-manager strategy begin ===
 NFQWS_OPT="--dpi-desync=fake,split2"
-# === zapretozz strategy end ===
+# === nzapret-manager strategy end ===
 CFG
     chmod 0644 "$ZAPRET_CONFIG"
 }
@@ -64,7 +64,7 @@ zapret_write_unit() {
     info "Writing ${ZAPRET_UNIT}"
     cat >"$ZAPRET_UNIT" <<UNIT
 [Unit]
-Description=zapret DPI bypass daemon (managed by zapretozz)
+Description=zapret DPI bypass daemon (managed by nzapret-manager)
 After=network-online.target
 Wants=network-online.target
 
@@ -103,7 +103,7 @@ zapret_install() {
 
 zapret_update() {
     require_root
-    zapret_is_installed || die "zapret is not installed yet — run: zapretozz install"
+    zapret_is_installed || die "zapret is not installed yet — run: nzapret-manager install"
     zapret_clone
     make -C "$ZAPRET_DIR" clean >/dev/null 2>&1 || true
     zapret_build || return 1

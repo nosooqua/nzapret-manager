@@ -1,4 +1,4 @@
-# zapretozz-ubuntu
+# nzapret-manager
 
 Ubuntu-native manager for [bol-van/zapret](https://github.com/bol-van/zapret) — a DPI bypass daemon. Inspired by [Zapret-Manager](https://github.com/StressOzz/Zapret-Manager) (OpenWRT) and [zapret.installer](https://github.com/Snowy-Fluffy/zapret.installer).
 
@@ -21,9 +21,9 @@ DNSSEC, podkop, DoH, and OpenWRT-specific features are intentionally out of scop
 Tested on Ubuntu 22.04 / 24.04.
 
 ```sh
-sudo bash install.sh         # deploy zapretozz under /opt/zapretozz, install deps
-sudo zapretozz install       # clone + build bol-van/zapret, enable systemd unit
-sudo zapretozz               # open the TUI
+sudo bash install.sh               # deploy nzapret-manager under /opt/nzapret-manager, install deps
+sudo nzapret-manager install       # clone + build bol-van/zapret, enable systemd unit
+sudo nzapret-manager               # open the TUI
 ```
 
 One-shot via curl:
@@ -35,37 +35,37 @@ curl -fsSL https://raw.githubusercontent.com/nosooqua/nzapret-manager/main/insta
 ## CLI quick reference
 
 ```
-zapretozz                          open TUI
-zapretozz install | update | uninstall
-zapretozz list [builtin|youtube|discord|all]
-zapretozz preview <id>
-zapretozz apply   <id>             id ∈ v1..v9 | Yv01..Yv100+ | Dv1..Dv17
-zapretozz current
-zapretozz test    [general|youtube|discord|all]
-zapretozz fetch-youtube            (re)fetch Yv* catalog
-zapretozz hosts   <enable|disable|list|disable-all> [name]
-zapretozz service <start|stop|restart|enable|disable|status|log>
-zapretozz backup  <create|list|restore <file>|prune [N]>
+nzapret-manager                          open TUI
+nzapret-manager install | update | uninstall
+nzapret-manager list [builtin|youtube|discord|all]
+nzapret-manager preview <id>
+nzapret-manager apply   <id>             id ∈ v1..v9 | Yv01..Yv100+ | Dv1..Dv17
+nzapret-manager current
+nzapret-manager test    [general|youtube|discord|all]
+nzapret-manager fetch-youtube            (re)fetch Yv* catalog
+nzapret-manager hosts   <enable|disable|list|disable-all> [name]
+nzapret-manager service <start|stop|restart|enable|disable|status|log>
+nzapret-manager backup  <create|list|restore <file>|prune [N]>
 ```
 
 ## Layout
 
 | Path | Owner | Purpose |
 | --- | --- | --- |
-| `/opt/zapretozz/` | this project | code + data |
+| `/opt/nzapret-manager/` | this project | code + data |
 | `/opt/zapret/` | `bol-van/zapret` | binaries (`nfqws`, `tpws`), upstream config |
 | `/etc/systemd/system/zapret.service` | this project | systemd unit |
-| `/etc/zapretozz/state` | this project | active strategy, hosts toggles |
-| `/var/log/zapretozz/` | this project | auto-test CSVs, build logs |
-| `/var/backups/zapretozz/` | this project | tar.gz snapshots |
+| `/etc/nzapret-manager/state` | this project | active strategy, hosts toggles |
+| `/var/log/nzapret-manager/` | this project | auto-test CSVs, build logs |
+| `/var/backups/nzapret-manager/` | this project | tar.gz snapshots |
 
 ## Uninstall
 
 ```sh
-sudo bash /opt/zapretozz/uninstall.sh
+sudo bash /opt/nzapret-manager/uninstall.sh
 ```
 
-Backups in `/var/backups/zapretozz/` are kept so a re-install can restore.
+Backups in `/var/backups/nzapret-manager/` are kept so a re-install can restore.
 
 ## Credits
 

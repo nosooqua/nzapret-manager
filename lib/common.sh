@@ -1,26 +1,26 @@
 #!/usr/bin/env bash
-# Common helpers, paths, and styling shared across all zapretozz modules.
+# Common helpers, paths, and styling shared across all nzapret-manager modules.
 
 set -o pipefail
 
-ZAPRETOZZ_DIR="${ZAPRETOZZ_DIR:-/opt/zapretozz}"
+NZAPRET_MANAGER_DIR="${NZAPRET_MANAGER_DIR:-/opt/nzapret-manager}"
 ZAPRET_DIR="${ZAPRET_DIR:-/opt/zapret}"
 ZAPRET_REPO="${ZAPRET_REPO:-https://github.com/bol-van/zapret.git}"
 ZAPRET_UNIT="/etc/systemd/system/zapret.service"
 ZAPRET_CONFIG="${ZAPRET_DIR}/config"
 
-STATE_DIR="/etc/zapretozz"
+STATE_DIR="/etc/nzapret-manager"
 STATE_FILE="${STATE_DIR}/state"
-LOG_DIR="/var/log/zapretozz"
-BACKUP_DIR="/var/backups/zapretozz"
-DATA_DIR="${ZAPRETOZZ_DIR}/data"
+LOG_DIR="/var/log/nzapret-manager"
+BACKUP_DIR="/var/backups/nzapret-manager"
+DATA_DIR="${NZAPRET_MANAGER_DIR}/data"
 STRATEGY_DIR="${DATA_DIR}/strategies"
 HOSTS_FRAGMENT_DIR="${DATA_DIR}/hosts"
 YT_STRATEGY_URL="${YT_STRATEGY_URL:-https://raw.githubusercontent.com/StressOzz/Zapret-Manager/refs/heads/main/ListStrYou}"
 
-STRATEGY_BEGIN="# === zapretozz strategy begin ==="
-STRATEGY_END="# === zapretozz strategy end ==="
-HOSTS_MARKER_PREFIX="# === zapretozz:"
+STRATEGY_BEGIN="# === nzapret-manager strategy begin ==="
+STRATEGY_END="# === nzapret-manager strategy end ==="
+HOSTS_MARKER_PREFIX="# === nzapret-manager:"
 
 if [[ -t 1 ]]; then
     C_RESET=$'\033[0m'

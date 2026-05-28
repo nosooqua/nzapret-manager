@@ -1,4 +1,4 @@
-# Auto-test URL catalog used by `zapretozz test`.
+# Auto-test URL catalog used by `nzapret-manager test`.
 # Format:  <scope>  <url>
 # Scope tags: general | youtube | discord | ai
 # Lines starting with '#' are ignored.

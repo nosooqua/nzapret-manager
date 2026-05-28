@@ -118,7 +118,7 @@ strategy_test_run() {
         if [[ ${ans,,} == y* ]]; then
             strategies_apply "$best"
         else
-            info "Best result not applied. Re-apply manually: zapretozz apply $best"
+            info "Best result not applied. Re-apply manually: nzapret-manager apply $best"
         fi
     fi
     ok "Full results: $csv"

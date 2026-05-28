@@ -16,10 +16,12 @@ TEST_PARALLEL="${TEST_PARALLEL:-8}"
 _test_urls_for_scope() {
     local scope="$1"
     [[ -r $TEST_URLS_FILE ]] || die "Missing $TEST_URLS_FILE"
+    local -a files=("$TEST_URLS_FILE")
+    [[ -r $USER_TEST_URLS ]] && files+=("$USER_TEST_URLS")
     if [[ $scope == all ]]; then
-        awk '!/^[[:space:]]*(#|$)/ { print $2 }' "$TEST_URLS_FILE"
+        awk '!/^[[:space:]]*(#|$)/ { print $2 }' "${files[@]}"
     else
-        awk -v s="$scope" '!/^[[:space:]]*(#|$)/ && $1 == s { print $2 }' "$TEST_URLS_FILE"
+        awk -v s="$scope" '!/^[[:space:]]*(#|$)/ && $1 == s { print $2 }' "${files[@]}"
     fi
 }
 

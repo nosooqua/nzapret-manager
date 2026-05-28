@@ -14,12 +14,23 @@
 HOSTS_FILE="${HOSTS_FILE:-/etc/hosts}"
 
 hosts_blocks_available() {
-    [[ -d $HOSTS_FRAGMENT_DIR ]] || return 0
-    local f
-    for f in "$HOSTS_FRAGMENT_DIR"/*.hosts; do
-        [[ -e $f ]] || continue
-        basename "$f" .hosts
-    done | sort
+    {
+        [[ -d $HOSTS_FRAGMENT_DIR ]] && find "$HOSTS_FRAGMENT_DIR" -maxdepth 1 -name '*.hosts' -printf '%f\n' 2>/dev/null
+        [[ -d $USER_HOSTS_DIR     ]] && find "$USER_HOSTS_DIR"     -maxdepth 1 -name '*.hosts' -printf '%f\n' 2>/dev/null
+    } | sed 's/\.hosts$//' | sort -u
+}
+
+hosts_fragment_path() {
+    # User-defined fragments override shipped ones.
+    local name="$1"
+    if   [[ -f ${USER_HOSTS_DIR}/${name}.hosts     ]]; then printf '%s\n' "${USER_HOSTS_DIR}/${name}.hosts"
+    elif [[ -f ${HOSTS_FRAGMENT_DIR}/${name}.hosts ]]; then printf '%s\n' "${HOSTS_FRAGMENT_DIR}/${name}.hosts"
+    else return 1
+    fi
+}
+
+hosts_is_user_block() {
+    [[ -f ${USER_HOSTS_DIR}/${1}.hosts ]]
 }
 
 hosts_block_enabled() {
@@ -29,16 +40,14 @@ hosts_block_enabled() {
 
 hosts_label_for() {
     local name="$1"
-    local f="${HOSTS_FRAGMENT_DIR}/${name}.hosts"
-    [[ -r $f ]] || return 1
+    local f; f=$(hosts_fragment_path "$name") || return 1
     awk '/^[[:space:]]*#/ { sub(/^[[:space:]]*#[[:space:]]*/, ""); print; exit }' "$f"
 }
 
 hosts_enable() {
     require_root
     local name="$1"
-    local frag="${HOSTS_FRAGMENT_DIR}/${name}.hosts"
-    [[ -f $frag ]] || die "No such hosts block: $name"
+    local frag; frag=$(hosts_fragment_path "$name") || die "No such hosts block: $name"
     if hosts_block_enabled "$name"; then
         info "Block already enabled: $name (refreshing)"
         hosts_disable "$name" >/dev/null

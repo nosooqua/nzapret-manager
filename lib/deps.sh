@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Install apt dependencies required to build and run bol-van/zapret.
 
-DEPS_BASE=(git curl ca-certificates jq tar gzip)
+DEPS_BASE=(git curl ca-certificates jq tar gzip python3)
 DEPS_BUILD=(build-essential pkg-config libnetfilter-queue-dev libmnl-dev libcap-dev libcap2-bin zlib1g-dev)
 DEPS_RUNTIME=(iptables nftables ipset)
 

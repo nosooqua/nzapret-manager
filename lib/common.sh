@@ -16,7 +16,18 @@ BACKUP_DIR="/var/backups/nzapret-manager"
 DATA_DIR="${NZAPRET_MANAGER_DIR}/data"
 STRATEGY_DIR="${DATA_DIR}/strategies"
 HOSTS_FRAGMENT_DIR="${DATA_DIR}/hosts"
+USER_HOSTS_DIR="${STATE_DIR}/hosts.d"
+USER_TEST_URLS="${STATE_DIR}/test-urls.user.txt"
 YT_STRATEGY_URL="${YT_STRATEGY_URL:-https://raw.githubusercontent.com/StressOzz/Zapret-Manager/refs/heads/main/ListStrYou}"
+
+# Upstream zapret per-user list files (read by get_hostlist.sh).
+ZAPRET_USER_LIST="${ZAPRET_DIR}/ipset/zapret-hosts-user.txt"
+ZAPRET_USER_EXCLUDE="${ZAPRET_DIR}/ipset/zapret-hosts-user-exclude.txt"
+ZAPRET_USER_IPBAN="${ZAPRET_DIR}/ipset/zapret-hosts-user-ipban.txt"
+
+# DoH (dnscrypt-proxy) config paths.
+DOH_CONFIG="/etc/dnscrypt-proxy/dnscrypt-proxy.toml"
+DOH_RESOLVED_DROPIN="/etc/systemd/resolved.conf.d/nzapret-manager.conf"
 
 STRATEGY_BEGIN="# === nzapret-manager strategy begin ==="
 STRATEGY_END="# === nzapret-manager strategy end ==="
@@ -64,7 +75,27 @@ pause() {
 }
 
 ensure_dirs() {
-    install -d -m 0755 "$STATE_DIR" "$LOG_DIR" "$BACKUP_DIR"
+    install -d -m 0755 "$STATE_DIR" "$LOG_DIR" "$BACKUP_DIR" "$USER_HOSTS_DIR"
+}
+
+open_editor() {
+    local f="$1"
+    local ed="${EDITOR:-}"
+    if [[ -z $ed ]]; then
+        if   command -v nano >/dev/null 2>&1; then ed=nano
+        elif command -v vim  >/dev/null 2>&1; then ed=vim
+        elif command -v vi   >/dev/null 2>&1; then ed=vi
+        else die "No editor found. Set \$EDITOR (e.g. EDITOR=nano)."
+        fi
+    fi
+    "$ed" "$f"
+}
+
+prompt() {
+    # Args: <prompt-text>  → echoes the typed value on stdout.
+    local p="$1" ans
+    read -rp "$p" ans || return 1
+    printf '%s' "$ans"
 }
 
 state_get() {

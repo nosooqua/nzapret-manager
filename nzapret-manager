@@ -12,7 +12,10 @@
 #   nzapret-manager current            show currently applied strategy
 #   nzapret-manager test [scope]       parallel-curl auto-test (general|youtube|discord|all)
 #   nzapret-manager fetch-youtube      (re)fetch the YouTube strategy catalog
-#   nzapret-manager hosts <enable|disable|list> [name]
+#   nzapret-manager hosts <enable|disable|list|disable-all|create|edit|delete> [name]
+#   nzapret-manager test-urls edit     edit user test-URL overlay
+#   nzapret-manager zapret-list <user|exclude|ipban> edit     edit upstream zapret per-user list
+#   nzapret-manager doh <list|apply <id>|disable|remove|status|test>
 #   nzapret-manager service <start|stop|restart|enable|disable|status>
 #   nzapret-manager backup <create|list|restore <file>|prune [N]>
 #   nzapret-manager version
@@ -37,6 +40,10 @@ NZAPRET_MANAGER_DIR="$NZAPRET_MANAGER_HOME"
 . "${LIB}/strategy_test.sh"
 # shellcheck source=/dev/null
 . "${LIB}/hosts.sh"
+# shellcheck source=/dev/null
+. "${LIB}/customlists.sh"
+# shellcheck source=/dev/null
+. "${LIB}/doh.sh"
 # shellcheck source=/dev/null
 . "${LIB}/backup.sh"
 # shellcheck source=/dev/null
@@ -75,16 +82,45 @@ case "$cmd" in
     hosts)
         sub="${1:-list}"; shift || true
         case "$sub" in
-            list)
-                for b in $(hosts_blocks_available); do
-                    local_mark="-"; hosts_block_enabled "$b" && local_mark="+"
-                    printf '%s %-18s %s\n' "$local_mark" "$b" "$(hosts_label_for "$b" || true)"
-                done
-                ;;
-            enable)  [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts enable <name>";  hosts_enable "$1" ;;
-            disable) [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts disable <name>"; hosts_disable "$1" ;;
+            list)        custom_hosts_list ;;
+            enable)      [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts enable <name>";  hosts_enable "$1" ;;
+            disable)     [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts disable <name>"; hosts_disable "$1" ;;
             disable-all) hosts_disable_all ;;
+            create)      custom_hosts_create "${1:-}" ;;
+            edit)        [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts edit <name>";   custom_hosts_edit "$1" ;;
+            delete)      [[ -n ${1:-} ]] || die "Usage: nzapret-manager hosts delete <name>"; custom_hosts_delete "$1" ;;
             *) die "Unknown hosts subcommand: $sub" ;;
+        esac
+        ;;
+    test-urls)
+        sub="${1:-edit}"; shift || true
+        case "$sub" in
+            edit) custom_test_urls_edit ;;
+            *) die "Unknown test-urls subcommand: $sub" ;;
+        esac
+        ;;
+    zapret-list)
+        kind="${1:-}"; shift || true
+        sub="${1:-edit}"; shift || true
+        case "$sub" in
+            edit) custom_zapret_list_edit "$kind" ;;
+            *) die "Usage: nzapret-manager zapret-list <user|exclude|ipban> edit" ;;
+        esac
+        ;;
+    doh)
+        sub="${1:-status}"; shift || true
+        case "$sub" in
+            list)    doh_list_presets ;;
+            apply)   [[ -n ${1:-} ]] || die "Usage: nzapret-manager doh apply <id>"; doh_apply_preset "$1" ;;
+            disable) doh_disable ;;
+            remove)  doh_remove ;;
+            status)
+                cur=$(doh_current)
+                printf 'service: %s\n' "$(doh_status_line)"
+                printf 'preset:  %s\n' "${cur:-<none>}"
+                ;;
+            test)    doh_test_resolver ;;
+            *) die "Unknown doh subcommand: $sub" ;;
         esac
         ;;
     service)

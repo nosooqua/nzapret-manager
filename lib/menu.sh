@@ -13,6 +13,7 @@ menu_header() {
     fi
     local active; active=$(state_get ACTIVE_STRATEGY 2>/dev/null || true)
     printf '  Strategy:%s\n' " ${active:-—}"
+    printf '  DoH:     %s\n' "$(doh_status_line)"
     printf '\n'
 }
 
@@ -22,16 +23,20 @@ menu_main() {
         printf '  %s1)%s Install / Update / Remove zapret\n' "$C_CYAN" "$C_RESET"
         printf '  %s2)%s Strategies\n'                       "$C_CYAN" "$C_RESET"
         printf '  %s3)%s /etc/hosts blocks\n'                "$C_CYAN" "$C_RESET"
-        printf '  %s4)%s Service control\n'                  "$C_CYAN" "$C_RESET"
-        printf '  %s5)%s Backup & restore\n'                 "$C_CYAN" "$C_RESET"
+        printf '  %s4)%s Custom lists (hosts / test URLs / zapret user lists)\n' "$C_CYAN" "$C_RESET"
+        printf '  %s5)%s DNS over HTTPS (DoH)\n'             "$C_CYAN" "$C_RESET"
+        printf '  %s6)%s Service control\n'                  "$C_CYAN" "$C_RESET"
+        printf '  %s7)%s Backup & restore\n'                 "$C_CYAN" "$C_RESET"
         printf '  %s0)%s Exit\n\n'                           "$C_CYAN" "$C_RESET"
         local c; read -rp "Choose: " c || break
         case "$c" in
             1) menu_install ;;
             2) menu_strategies ;;
             3) menu_hosts ;;
-            4) menu_service ;;
-            5) menu_backup ;;
+            4) menu_custom ;;
+            5) menu_doh ;;
+            6) menu_service ;;
+            7) menu_backup ;;
             0|q|Q) break ;;
             *) warn "Invalid choice"; sleep 1 ;;
         esac
@@ -148,21 +153,107 @@ menu_hosts() {
         while IFS= read -r b; do
             local mark=' '
             hosts_block_enabled "$b" && mark="${C_GREEN}✓${C_RESET}"
-            printf '  %s%2d)%s [%b] %-18s %s\n' "$C_CYAN" "$i" "$C_RESET" "$mark" "$b" "$(hosts_label_for "$b")"
+            local tag="     "
+            hosts_is_user_block "$b" && tag="${C_MAGENTA}user${C_RESET} "
+            printf '  %s%2d)%s [%b] %b%-18s %s\n' "$C_CYAN" "$i" "$C_RESET" "$mark" "$tag" "$b" "$(hosts_label_for "$b")"
             names+=("$b")
             i=$((i+1))
         done < <(hosts_blocks_available)
-        printf '\n  %sA)%s Enable all   %sN)%s Disable all   %s0)%s Back\n\n' \
-            "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET"
-        local c; read -rp "Toggle (number) / A / N / 0: " c
+        printf '\n  %sA)%s Enable all   %sN)%s Disable all\n' \
+            "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET"
+        printf '  %sC)%s Create custom block   %sE)%s Edit block   %sD)%s Delete user block   %s0)%s Back\n\n' \
+            "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET"
+        local c; read -rp "Toggle (number) / A / N / C / E / D / 0: " c
         case "$c" in
             0) return ;;
             a|A) for b in "${names[@]}"; do hosts_block_enabled "$b" || hosts_enable "$b"; done; pause ;;
             n|N) hosts_disable_all; pause ;;
+            c|C) custom_hosts_create; pause ;;
+            e|E)
+                local name; name=$(prompt "Block to edit (name): ")
+                [[ -n $name ]] && custom_hosts_edit "$name"
+                pause
+                ;;
+            d|D)
+                local name; name=$(prompt "User block to delete (name): ")
+                [[ -n $name ]] && custom_hosts_delete "$name"
+                pause
+                ;;
             *)
                 if [[ $c =~ ^[0-9]+$ ]] && (( c >= 1 && c <= ${#names[@]} )); then
                     local sel="${names[$((c-1))]}"
                     if hosts_block_enabled "$sel"; then hosts_disable "$sel"; else hosts_enable "$sel"; fi
+                else
+                    warn "Invalid"; sleep 1
+                fi
+                ;;
+        esac
+    done
+}
+
+menu_custom() {
+    while true; do
+        menu_header
+        printf '  Custom lists\n\n'
+        printf '  %s1)%s Create custom /etc/hosts block\n'  "$C_CYAN" "$C_RESET"
+        printf '  %s2)%s Edit existing /etc/hosts block\n'  "$C_CYAN" "$C_RESET"
+        printf '  %s3)%s Delete user-defined /etc/hosts block\n' "$C_CYAN" "$C_RESET"
+        printf '  %s4)%s Edit user test-URL overlay\n'      "$C_CYAN" "$C_RESET"
+        printf '  %s5)%s Edit zapret include list (zapret-hosts-user.txt)\n' "$C_CYAN" "$C_RESET"
+        printf '  %s6)%s Edit zapret exclude list (zapret-hosts-user-exclude.txt)\n' "$C_CYAN" "$C_RESET"
+        printf '  %s7)%s Edit zapret IP-ban list (zapret-hosts-user-ipban.txt)\n' "$C_CYAN" "$C_RESET"
+        printf '  %s8)%s List all hosts blocks (shipped + user)\n' "$C_CYAN" "$C_RESET"
+        printf '  %s0)%s Back\n\n'                          "$C_CYAN" "$C_RESET"
+        local c; read -rp "Choose: " c
+        case "$c" in
+            1) custom_hosts_create; pause ;;
+            2)
+                local name; name=$(prompt "Block to edit (name): ")
+                [[ -n $name ]] && custom_hosts_edit "$name"
+                pause
+                ;;
+            3)
+                local name; name=$(prompt "User block to delete (name): ")
+                [[ -n $name ]] && custom_hosts_delete "$name"
+                pause
+                ;;
+            4) custom_test_urls_edit; pause ;;
+            5) custom_zapret_list_edit user;    pause ;;
+            6) custom_zapret_list_edit exclude; pause ;;
+            7) custom_zapret_list_edit ipban;   pause ;;
+            8) custom_hosts_list; pause ;;
+            0) return ;;
+            *) warn "Invalid"; sleep 1 ;;
+        esac
+    done
+}
+
+menu_doh() {
+    while true; do
+        menu_header
+        printf '  DNS over HTTPS\n\n'
+        local -a ids=()
+        local i=1 id label kind payload mark cur
+        cur=$(doh_current)
+        while IFS='|' read -r id label kind payload; do
+            mark=' '
+            [[ $cur == "$id" ]] && mark="${C_GREEN}✓${C_RESET}"
+            printf '  %s%2d)%s [%b] %-14s %s\n' "$C_CYAN" "$i" "$C_RESET" "$mark" "$id" "$label"
+            ids+=("$id")
+            i=$((i+1))
+        done < <(_doh_presets)
+        printf '\n  %sT)%s Test resolver   %sX)%s Disable DoH   %sR)%s Remove (purge dnscrypt-proxy)   %s0)%s Back\n\n' \
+            "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET" "$C_CYAN" "$C_RESET"
+        local c; read -rp "Choose: " c
+        case "$c" in
+            0) return ;;
+            t|T) doh_test_resolver; pause ;;
+            x|X) doh_disable; pause ;;
+            r|R) doh_remove; pause ;;
+            *)
+                if [[ $c =~ ^[0-9]+$ ]] && (( c >= 1 && c <= ${#ids[@]} )); then
+                    doh_apply_preset "${ids[$((c-1))]}"
+                    pause
                 else
                     warn "Invalid"; sleep 1
                 fi

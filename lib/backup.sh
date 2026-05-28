@@ -14,12 +14,17 @@ backup_create() {
     ' "$HOSTS_FILE" >"$hosts_snip"
 
     info "Creating $archive"
+    local -a paths=("${ZAPRET_CONFIG#/}" "${STATE_DIR#/}" "${ZAPRET_UNIT#/}")
+    # Optional bits — included only if present.
+    [[ -f $DOH_CONFIG          ]] && paths+=("${DOH_CONFIG#/}")
+    [[ -f $DOH_RESOLVED_DROPIN ]] && paths+=("${DOH_RESOLVED_DROPIN#/}")
+    [[ -f $ZAPRET_USER_LIST    ]] && paths+=("${ZAPRET_USER_LIST#/}")
+    [[ -f $ZAPRET_USER_EXCLUDE ]] && paths+=("${ZAPRET_USER_EXCLUDE#/}")
+    [[ -f $ZAPRET_USER_IPBAN   ]] && paths+=("${ZAPRET_USER_IPBAN#/}")
     tar -czf "$archive" \
         --transform 's,^/,/,' \
         -C / \
-        "${ZAPRET_CONFIG#/}" \
-        "${STATE_DIR#/}" \
-        "${ZAPRET_UNIT#/}" 2>/dev/null
+        "${paths[@]}" 2>/dev/null
     tar -rzf "$archive" --transform "s,.*,nzapret-manager-hosts.snippet," "$hosts_snip" 2>/dev/null || \
         tar -czf "$archive" --transform "s,.*,nzapret-manager-hosts.snippet," "$hosts_snip" 2>/dev/null
     rm -f "$hosts_snip"

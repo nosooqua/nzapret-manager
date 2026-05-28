@@ -1,0 +1,36 @@
+# AI services — Gemini, Grok, ChatGPT, Copilot, ElevenLabs, DeepL, Claude, Trae, Windsurf, Manus, Notion, AIStudio
+# Gemini
+45.155.204.190 gemini.google.com
+# Grok
+45.155.204.190 grok.com accounts.x.ai assets.grok.com
+# OpenAI / ChatGPT
+45.155.204.190 chatgpt.com ab.chatgpt.com auth.openai.com auth0.openai.com platform.openai.com cdn.oaistatic.com
+45.155.204.190 tcr9i.chat.openai.com webrtc.chatgpt.com android.chat.openai.com api.openai.com operator.chatgpt.com
+45.155.204.190 sora.chatgpt.com sora.com videos.openai.com ios.chat.openai.com cdn.auth0.com files.oaiusercontent.com
+# Microsoft Copilot / Bing
+45.155.204.190 copilot.microsoft.com sydney.bing.com edgeservices.bing.com rewards.bing.com
+45.155.204.190 xsts.auth.xboxlive.com xgpuwebf2p.gssv-play-prod.xboxlive.com xgpuweb.gssv-play-prod.xboxlive.com
+# ElevenLabs
+45.155.204.190 elevenlabs.io api.us.elevenlabs.io elevenreader.io api.elevenlabs.io help.elevenlabs.io
+# DeepL
+45.155.204.190 deepl.com www.deepl.com www2.deepl.com login-wall.deepl.com w.deepl.com dict.deepl.com ita-free.www.deepl.com
+45.155.204.190 write-free.www.deepl.com experimentation.deepl.com experimentation-grpc.deepl.com ita-free.app.deepl.com
+45.155.204.190 ott.deepl.com api-free.deepl.com backend.deepl.com clearance.deepl.com errortracking.deepl.com
+45.155.204.190 oneshot-free.www.deepl.com checkout.www.deepl.com gtm.deepl.com auth.deepl.com shield.deepl.com
+# Claude / Anthropic
+45.155.204.190 claude.ai console.anthropic.com api.anthropic.com
+# Trae.ai
+45.155.204.190 trae-api-sg.mchost.guru api.trae.ai api-sg-central.trae.ai api16-normal-alisg.mchost.guru
+# Windsurf / Codeium
+45.155.204.190 windsurf.com codeium.com server.codeium.com web-backend.codeium.com marketplace.windsurf.com
+45.155.204.190 unleash.codeium.com inference.codeium.com windsurf-stable.codeium.com
+144.31.14.104 windsurf-telemetry.codeium.com
+# Manus
+45.155.204.190 manus.im api.manus.im
+# Notion
+45.155.204.190 www.notion.so calendar.notion.so
+# AIStudio / Google Labs
+45.155.204.190 aistudio.google.com generativelanguage.googleapis.com aitestkitchen.withgoogle.com aisandbox-pa.googleapis.com xsts.auth.xboxlive.com
+45.155.204.190 webchannel-alkalimakersuite-pa.clients6.google.com alkalimakersuite-pa.clients6.google.com assistant-s3-pa.googleapis.com
+45.155.204.190 proactivebackend-pa.googleapis.com robinfrontend-pa.googleapis.com o.pki.goog labs.google labs.google.com notebooklm.google
+45.155.204.190 notebooklm.google.com jules.google.com stitch.withgoogle.com gemini.google.com

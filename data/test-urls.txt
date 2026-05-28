@@ -1,0 +1,26 @@
+# Auto-test URL catalog used by `zapretozz test`.
+# Format:  <scope>  <url>
+# Scope tags: general | youtube | discord | ai
+# Lines starting with '#' are ignored.
+
+# general
+general  https://www.gosuslugi.ru/
+general  https://www.rutracker.org/forum/index.php
+general  https://ntc.party/
+general  https://lib.rus.ec/
+general  https://rutor.info/
+general  https://www.instagram.com/
+
+# youtube
+youtube  https://www.youtube.com/
+youtube  https://i.ytimg.com/vi/dQw4w9WgXcQ/maxresdefault.jpg
+youtube  https://www.googlevideo.com/
+
+# discord
+discord  https://discord.com/
+discord  https://canary.discord.com/api/v9/gateway
+
+# ai
+ai       https://claude.ai/
+ai       https://chatgpt.com/
+ai       https://gemini.google.com/
